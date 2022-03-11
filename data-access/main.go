@@ -42,19 +42,30 @@ func main() {
 	}
 	fmt.Println("Connected!")
 
-	// Get data from DB
+	// Test the query. (expect multiple rows)
 	albums, err := albumsByArtist("John Coltrane")
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("Albums found: %v\n", albums)
 
-	// Hard-code ID 2 here to test the query.
+	// Hard-code ID 2 here to test the query. (expect a row)
 	alb, err := albumByID(2)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("Album found: %v\n", alb)
+
+	// Test the INSERT
+	albID, err := addAlbum(Album{
+		Title:  "The Modern Sound of Betty Carter",
+		Artist: "Betty Carter",
+		Price:  49.99,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("ID of added album: %v\n", albID)
 }
 
 // albumsByArtist queries for albums that have the specified artist name.
@@ -94,4 +105,18 @@ func albumByID(id int64) (Album, error) {
 		return alb, fmt.Errorf("albumsById %d: %v", id, err)
 	}
 	return alb, nil
+}
+
+// addAlbum adds the specified album to the database,
+// returning the album ID of the new entry
+func addAlbum(alb Album) (int64, error) {
+	result, err := db.Exec("INSERT INTO album (title, artist, price) VALUES (?, ?, ?)", alb.Title, alb.Artist, alb.Price)
+	if err != nil {
+		return 0, fmt.Errorf("addAlbum: %v", err)
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("addAlbum: %v", err)
+	}
+	return id, nil
 }
