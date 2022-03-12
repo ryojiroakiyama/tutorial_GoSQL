@@ -30,7 +30,7 @@ func main() {
 	//	AllowNativePasswords: true, // added for native password authentication(?)
 	//}
 	//formatDSN := cfg.FormatDSN()
-	formatDSN := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/recordings?checkConnLiveness=false&maxAllowedPacket=0", os.Getenv("DBUSER"), os.Getenv("DBPASS")) // good practice: Avoid storing database credentials
+	formatDSN := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/recordings?checkConnLiveness=false&maxAllowedPacket=0", os.Getenv("DBUSER"), os.Getenv("DBPASS")) // good practice: Avoid storing database credentials (is risk like SQL injections??)
 
 	// Get a database handle.
 	var err error
