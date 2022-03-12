@@ -6,10 +6,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // better practice: "_" for loosely-coupled
 )
 
-var db *sql.DB
+var db *sql.DB // bud prctice: Package variable. Just for simplicity,
 
 type Album struct {
 	ID     int64
@@ -19,26 +19,29 @@ type Album struct {
 }
 
 func main() {
+
 	// Capture connection properties.
-	cfg := mysql.Config{
-		User:                 os.Getenv("DBUSER"),
-		Passwd:               os.Getenv("DBPASS"),
-		Net:                  "tcp",
-		Addr:                 "127.0.0.1:3306",
-		DBName:               "recordings",
-		AllowNativePasswords: true, // added for native password authentication(?)
-	}
+	//cfg := mysql.Config{
+	//	User:                 os.Getenv("DBUSER"),
+	//	Passwd:               os.Getenv("DBPASS"),
+	//	Net:                  "tcp",
+	//	Addr:                 "127.0.0.1:3306",
+	//	DBName:               "recordings",
+	//	AllowNativePasswords: true, // added for native password authentication(?)
+	//}
+	//formatDSN := cfg.FormatDSN()
+	formatDSN := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/recordings?checkConnLiveness=false&maxAllowedPacket=0", os.Getenv("DBUSER"), os.Getenv("DBPASS")) // good practice: Avoid storing database credentials
 
 	// Get a database handle.
 	var err error
-	db, err = sql.Open("mysql", cfg.FormatDSN())
+	db, err = sql.Open("mysql", formatDSN) // Validate arguments without creating a connection.
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Open: ", err)
 	}
 
-	pingErr := db.Ping()
+	pingErr := db.Ping() // Confirm connection.
 	if pingErr != nil {
-		log.Fatal(pingErr)
+		log.Fatal("Ping: ", pingErr)
 	}
 	fmt.Println("Connected!")
 
@@ -56,7 +59,7 @@ func main() {
 	}
 	fmt.Printf("Album found: %v\n", alb)
 
-	// Test the INSERT
+	// Test the execute INSERT
 	albID, err := addAlbum(Album{
 		Title:  "The Modern Sound of Betty Carter",
 		Artist: "Betty Carter",
