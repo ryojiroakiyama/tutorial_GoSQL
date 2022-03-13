@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql" // better practice: "_" for loosely-coupled
 )
 
-var db *sql.DB // bud prctice: Package variable. Just for simplicity,
+var db *sql.DB // bud prctice: Package variable. Just for simplicity.
 
 type Album struct {
 	ID     int64
@@ -30,7 +30,10 @@ func main() {
 	//	AllowNativePasswords: true, // added for native password authentication(?)
 	//}
 	//formatDSN := cfg.FormatDSN()
-	formatDSN := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/recordings?checkConnLiveness=false&maxAllowedPacket=0", os.Getenv("DBUSER"), os.Getenv("DBPASS")) // good practice: Avoid storing database credentials (is risk like SQL injections??)
+
+	// good practice: Create a structure and a method like Config or FormatDSN above by myself because mysql package is "_"
+	// Below is just for simplicity.
+	formatDSN := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/recordings?checkConnLiveness=false&maxAllowedPacket=0", os.Getenv("DBUSER"), os.Getenv("DBPASS"))
 
 	// Get a database handle.
 	var err error
